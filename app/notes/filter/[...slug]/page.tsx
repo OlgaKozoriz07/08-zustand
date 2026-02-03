@@ -5,6 +5,7 @@ import {
 } from "@tanstack/react-query";
 import { fetchNotes } from "@/lib/api";
 import NoteClient from "./Notes.client";
+import { Metadata } from "next";
 
 interface NotesByCategoryProps {
   params: Promise<{ slug: string[] }>;
@@ -14,7 +15,34 @@ interface NotesByCategoryProps {
   }>;
 }
 
-const NotesByCategory = async ({ params, searchParams }: NotesByCategoryProps) => {
+export async function generateMetadata({
+  params,
+}: NotesByCategoryProps): Promise<Metadata> {
+  const { slug } = await params;
+  const tag = slug[0] === "all" ? "all" : slug[0];
+  return {
+    title: `${tag} notes`,
+    description: `All notes ${tag}`,
+    openGraph: {
+      title: `${tag} notes`,
+      description: `All notes ${tag}`,
+      url: `https://08-zustand-aedg.vercel.app//notes/filter/${tag}`,
+      images: [
+        {
+          url: "https://ac.goit.global/fullstack/react/notehub-og-meta.jpg",
+          width: 1200,
+          height: 630,
+          alt: `${tag}`,
+        },
+      ],
+    },
+  };
+}
+
+const NotesByCategory = async ({
+  params,
+  searchParams,
+}: NotesByCategoryProps) => {
   const { slug } = await params;
   const tag = slug[0] === "all" ? undefined : slug[0];
 
@@ -35,4 +63,4 @@ const NotesByCategory = async ({ params, searchParams }: NotesByCategoryProps) =
   );
 };
 
-export default NotesByCategory;   
+export default NotesByCategory;

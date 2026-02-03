@@ -8,9 +8,8 @@ import NoteList from "@/components/NoteList/NoteList";
 import toast, { Toaster } from "react-hot-toast";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { fetchNotes } from "@/lib/api";
-import Modal from "@/components/Modal/Modal";
 import Pagination from "@/components/Pagination/Pagination";
-import NoteForm from "@/components/NoteForm/NoteForm";
+import Link from "next/link";
 
 type NoteDetailsClientProps = {
   tag?: string;
@@ -18,9 +17,10 @@ type NoteDetailsClientProps = {
 
 export default function NoteClient({ tag }: NoteDetailsClientProps) {
   const [currentPage, setCurrentPage] = useState(1);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const [currentQuery, setCurrentQuery] = useState("");
+  const [currentQuery, setCurrentQuery] = useState<string | undefined>(
+    undefined,
+  );
 
   const { data, isSuccess, isPending } = useQuery({
     queryKey: ["notes", currentPage, currentQuery, tag],
@@ -45,14 +45,6 @@ export default function NoteClient({ tag }: NoteDetailsClientProps) {
     600,
   );
 
-  function openModal(): void {
-    setIsModalOpen(true);
-  }
-
-  function closeModal(): void {
-    setIsModalOpen(false);
-  }
-
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
@@ -64,16 +56,11 @@ export default function NoteClient({ tag }: NoteDetailsClientProps) {
             setPage={setCurrentPage}
           />
         )}
-        <button className={css.button} onClick={openModal}>
+        <Link href={"/notes/action/create"} className={css.button}>
           Create note +
-        </button>
+        </Link>
       </header>
       {notes.length > 0 && <NoteList notes={notes} />}
-      {isModalOpen && (
-        <Modal onClose={closeModal}>
-          <NoteForm onCloseModal={closeModal} />
-        </Modal>
-      )}
       <Toaster />
     </div>
   );
